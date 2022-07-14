@@ -9,7 +9,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/wader/readline"
+	"github.com/jduhamel/readline"
 )
 
 func usage(w io.Writer) {

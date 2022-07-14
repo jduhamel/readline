@@ -1,5 +1,5 @@
 // fork of github.com/chzyer/readline
-module github.com/wader/readline
+module github.com/jduhamel/readline
 
 go 1.15
 
