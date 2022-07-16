@@ -514,7 +514,6 @@ func (r *RuneBuffer) refresh(f func()) {
 			r.lastChangeIdx = prevIdx
 		}
 	}
-
 }
 
 // getAndSetOffset queries the terminal for the current cursor position by

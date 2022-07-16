@@ -6,9 +6,7 @@ import (
 	"sync"
 )
 
-var (
-	ErrInterrupt = errors.New("Interrupt")
-)
+var ErrInterrupt = errors.New("Interrupt")
 
 type InterruptError struct {
 	Line []rune
@@ -112,10 +110,12 @@ func (o *Operation) ioloop() {
 		keepInSearchMode := false
 		keepInCompleteMode := false
 		r := o.t.ReadRune()
+
 		if o.GetConfig().FuncFilterInputRune != nil {
 			var process bool
 			r, process = o.GetConfig().FuncFilterInputRune(r)
 			if !process {
+				o.t.KickRead()
 				o.buf.Refresh(nil) // to refresh the line
 				continue           // ignore this rune
 			}
