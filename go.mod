@@ -1,7 +1,7 @@
-// fork of github.com/chzyer/readline
 module github.com/jduhamel/readline
 
-go 1.15
+// fork of github.com/chzyer/readline patches from cloudian and vader
+go 1.18
 
 require (
 	golang.org/x/sys v0.0.0-20220627191245-f75cf1eec38b
