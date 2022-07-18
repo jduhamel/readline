@@ -15,9 +15,7 @@ import (
 	"unicode"
 )
 
-var (
-	isWindows = false
-)
+var isWindows = false
 
 const (
 	CharLineStart = 1
@@ -230,15 +228,15 @@ func SplitByLine(prompt, rs []rune, offset, screenWidth, nextWidth int) [][]rune
 	currentWidth := offset
 	for i, r := range prs {
 		w := runes.Width(r)
-		if currentWidth + w > screenWidth {
+		if currentWidth+w > screenWidth {
 			ret = append(ret, prs[si:i])
 			si = i
 			currentWidth = 0
 		}
 		currentWidth += w
 	}
-	ret = append(ret, prs[si:len(prs)])
-	if currentWidth + nextWidth > screenWidth {
+	ret = append(ret, prs[si:])
+	if currentWidth+nextWidth > screenWidth {
 		ret = append(ret, []rune{})
 	}
 	return ret

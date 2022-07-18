@@ -35,7 +35,7 @@ func (o *opUndo) undo() {
 
 func (o *opUndo) init() {
 	o.stack = []undoEntry{
-		undoEntry{
+		{
 			pos: o.op.buf.idx,
 			buf: append([]rune{}, o.op.buf.buf...),
 		},

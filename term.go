@@ -2,6 +2,7 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
+//go:build aix || darwin || dragonfly || freebsd || (linux && !appengine) || netbsd || openbsd || os400 || solaris
 // +build aix darwin dragonfly freebsd linux,!appengine netbsd openbsd os400 solaris
 
 // Package terminal provides support functions for dealing with terminals, as

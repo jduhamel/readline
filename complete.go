@@ -25,21 +25,21 @@ func (t *TabCompleter) Do([]rune, int) ([][]rune, int) {
 }
 
 type opCompleter struct {
-	w               io.Writer
-	op              *Operation
-	width           int
-	height          int
+	w      io.Writer
+	op     *Operation
+	width  int
+	height int
 
-	inCompleteMode  bool
-	inSelectMode    bool
-	inPagerMode	bool
+	inCompleteMode bool
+	inSelectMode   bool
+	inPagerMode    bool
 
-	candidate          [][]rune      // list of candidates
-	candidateSource    []rune        // buffer string when tab was pressed
-	candidateOff       int           // num runes in common from buf where candidate start
-	candidateChoise    int           // candidate chosen (-1 for nothing yet) also used for paging
-	candidateColNum    int           // num columns candidates take 0..wraps, 1 col, 2 cols etc.
-	candidateColWidth  int           // width of candidate columns
+	candidate         [][]rune // list of candidates
+	candidateSource   []rune   // buffer string when tab was pressed
+	candidateOff      int      // num runes in common from buf where candidate start
+	candidateChoise   int      // candidate chosen (-1 for nothing yet) also used for paging
+	candidateColNum   int      // num columns candidates take 0..wraps, 1 col, 2 cols etc.
+	candidateColWidth int      // width of candidate columns
 }
 
 func newOpCompleter(w io.Writer, op *Operation, width, height int) *opCompleter {
@@ -91,7 +91,7 @@ func (o *opCompleter) OnComplete() (ringBell bool) {
 			if size > 0 {
 				buf.WriteRunes(same)
 				o.ExitCompleteMode(false)
-				return false  // partial completion so ring the bell
+				return false // partial completion so ring the bell
 			}
 		}
 		o.EnterCompleteSelectMode()
@@ -103,7 +103,7 @@ func (o *opCompleter) OnComplete() (ringBell bool) {
 	if len(newLines) == 0 || (len(newLines) == 1 && len(newLines[0]) == 0) {
 		o.ExitCompleteMode(false)
 		return false // will ring bell on initial tab press
-	} 
+	}
 	if o.candidateOff > offset {
 		// part of buffer we are completing has changed. Example might be that we were completing "ls" and
 		// user typed space so we are no longer completing "ls" but now we are completing an argument of
@@ -127,7 +127,7 @@ func (o *opCompleter) OnComplete() (ringBell bool) {
 		if size > 0 {
 			buf.WriteRunes(same)
 			o.ExitCompleteMode(false)
-			return false  // partial completion so ring the bell
+			return false // partial completion so ring the bell
 		}
 	}
 
@@ -162,7 +162,7 @@ func (o *opCompleter) HandleCompleteSelect(r rune) (stayInMode bool) {
 		}
 	case CharLineEnd:
 		if o.candidateColNum > 1 {
-			num := o.candidateColNum - o.candidateChoise % o.candidateColNum - 1
+			num := o.candidateColNum - o.candidateChoise%o.candidateColNum - 1
 			o.candidateChoise += num
 			if o.candidateChoise >= len(o.candidate) {
 				o.candidateChoise = len(o.candidate) - 1
@@ -194,7 +194,7 @@ func (o *opCompleter) HandleCompleteSelect(r rune) (stayInMode bool) {
 	case CharPrev:
 		colNum := 1
 		if o.candidateColNum > 1 {
-			colNum = o.candidateColNum 
+			colNum = o.candidateColNum
 		}
 		tmpChoise := o.candidateChoise - colNum
 		if tmpChoise < 0 {
@@ -222,15 +222,15 @@ func (o *opCompleter) HandleCompleteSelect(r rune) (stayInMode bool) {
 // we exit pager mode.
 func (o *opCompleter) HandlePagerMode(r rune) (stayInMode bool) {
 	switch r {
-	case ' ', 'Y', 'y':                // yes, show me more
-		return o.pagerRefresh()    // last page exits
-	case 'q','Q', 'N', 'n':            // no, quit giving me more
-		o.scrollOutOfPagerMode()   // adjust for prompt
-		o.ExitCompleteMode(true)   // completely exit complete mode
+	case ' ', 'Y', 'y': // yes, show me more
+		return o.pagerRefresh() // last page exits
+	case 'q', 'Q', 'N', 'n': // no, quit giving me more
+		o.scrollOutOfPagerMode() // adjust for prompt
+		o.ExitCompleteMode(true) // completely exit complete mode
 		return false
-	default:                           // invalid choice
-		o.op.t.Bell()              // ring bell
-		return true                // stay in pager mode
+	default: // invalid choice
+		o.op.t.Bell() // ring bell
+		return true   // stay in pager mode
 	}
 }
 
@@ -240,7 +240,7 @@ func (o *opCompleter) getMatrixSize() int {
 		colNum = o.candidateColNum
 	}
 	line := len(o.candidate) / colNum
-	if len(o.candidate) % colNum != 0 {
+	if len(o.candidate)%colNum != 0 {
 		line++
 	}
 	return line * colNum
@@ -283,11 +283,11 @@ func (o *opCompleter) setColumnInfo() {
 
 // needPagerMode returns true if number of candidates would go off the page
 func (o *opCompleter) needPagerMode() bool {
-	buflineCnt := o.op.buf.LineCount()           // lines taken by buffer content
-	linesAvail := o.height - buflineCnt          // lines available without scrolling buffer off screen
+	buflineCnt := o.op.buf.LineCount()  // lines taken by buffer content
+	linesAvail := o.height - buflineCnt // lines available without scrolling buffer off screen
 	if o.candidateColNum > 0 {
 		// Normal case where each candidate at least fits on a line
-		maxOrPage := linesAvail * o.candidateColNum  // max candiates without needing to page
+		maxOrPage := linesAvail * o.candidateColNum // max candiates without needing to page
 		return len(o.candidate) > maxOrPage
 	}
 
@@ -301,7 +301,7 @@ func (o *opCompleter) needPagerMode() bool {
 		cLines := 1
 		if o.width > 0 {
 			cLines = cWidth / o.width
-			if cWidth % o.width > 0 {
+			if cWidth%o.width > 0 {
 				cLines++
 			}
 		}
@@ -322,7 +322,7 @@ func (o *opCompleter) CompleteRefresh() {
 	buf := bufio.NewWriter(o.w)
 	// calculate num lines from cursor pos to where choices should be written
 	lineCnt := o.op.buf.CursorLineCount()
-	buf.Write(bytes.Repeat([]byte("\n"), lineCnt))  // move down from cursor to start of candidates
+	buf.Write(bytes.Repeat([]byte("\n"), lineCnt)) // move down from cursor to start of candidates
 	buf.WriteString("\033[J")
 
 	same := o.op.buf.RuneSlice(-o.candidateOff)
@@ -340,7 +340,7 @@ func (o *opCompleter) CompleteRefresh() {
 				sWidth = 1 // adjust for hightlighting on Windows
 			}
 			cLines = (cWidth + sWidth) / o.width
-			if (cWidth + sWidth) % o.width > 0 {
+			if (cWidth+sWidth)%o.width > 0 {
 				cLines++
 			}
 		}
@@ -360,7 +360,7 @@ func (o *opCompleter) CompleteRefresh() {
 		buf.WriteString(string(c))
 		if o.candidateColNum >= 1 {
 			// only output spaces between columns if everything fits
-			buf.Write(bytes.Repeat([]byte(" "), o.candidateColWidth - cWidth))
+			buf.Write(bytes.Repeat([]byte(" "), o.candidateColWidth-cWidth))
 		}
 
 		if inSelect {
@@ -378,7 +378,7 @@ func (o *opCompleter) CompleteRefresh() {
 		}
 	}
 	if colIdx > 0 {
-		lines++  // mid-line so count it.
+		lines++ // mid-line so count it.
 	}
 
 	// wrote out choices over "lines", move back to cursor (positioned at index)
@@ -396,39 +396,39 @@ func (o *opCompleter) pagerRefresh() (stayInMode bool) {
 	buf := bufio.NewWriter(o.w)
 	firstPage := o.candidateChoise == 0
 	if firstPage {
-		o.op.buf.SetOffset("1;1")     // paging, so reset any prompt offset
+		o.op.buf.SetOffset("1;1") // paging, so reset any prompt offset
 		// move down from cursor to where candidates should start
 		lineCnt := o.op.buf.CursorLineCount()
 		buf.Write(bytes.Repeat([]byte("\n"), lineCnt))
 	} else {
 		// after first page, redraw over --More--
 		buf.WriteString("\r")
-	}		
-	buf.WriteString("\033[J")   // clear anything below
+	}
+	buf.WriteString("\033[J") // clear anything below
 
 	same := o.op.buf.RuneSlice(-o.candidateOff)
 	sameWidth := runes.WidthAll(same)
 
 	colIdx := 0
 	lines := 1
-	for ; o.candidateChoise < len(o.candidate) ; o.candidateChoise++ {
+	for ; o.candidateChoise < len(o.candidate); o.candidateChoise++ {
 		c := o.candidate[o.candidateChoise]
 		cWidth := sameWidth + runes.WidthAll(c)
 		cLines := 1
 		if o.width > 0 {
 			cLines = cWidth / o.width
-			if cWidth % o.width > 0 {
+			if cWidth%o.width > 0 {
 				cLines++
 			}
 		}
-		if lines > 1 && lines + cLines > o.height {
+		if lines > 1 && lines+cLines > o.height {
 			break // won't fit on page, stop early.
 		}
 		buf.WriteString(string(same))
 		buf.WriteString(string(c))
 		if o.candidateColNum > 1 {
 			// only output spaces between columns if more than 1
-			buf.Write(bytes.Repeat([]byte(" "), o.candidateColWidth - cWidth))
+			buf.Write(bytes.Repeat([]byte(" "), o.candidateColWidth-cWidth))
 		}
 		colIdx++
 		if colIdx >= o.candidateColNum {
@@ -487,7 +487,7 @@ func (o *opCompleter) EnterCompleteMode(offset int, candidate [][]rune) {
 
 func (o *opCompleter) EnterPagerMode() {
 	o.inPagerMode = true
-	o.candidateChoise = 0   // next candidate to list on next page
+	o.candidateChoise = 0 // next candidate to list on next page
 	o.pagerRefresh()
 }
 

@@ -10,7 +10,7 @@ func main() {
 	rl, err := readline.NewEx(&readline.Config{
 		Prompt:                 "> ",
 		HistoryFile:            "/tmp/readline-multiline",
-		DisableAutoSaveHistory: true,
+		DisableAutoSaveHistory: false,
 	})
 	if err != nil {
 		panic(err)
@@ -18,6 +18,7 @@ func main() {
 	defer rl.Close()
 
 	var cmds []string
+	index := 0
 	for {
 		line, err := rl.Readline()
 		if err != nil {
@@ -30,12 +31,18 @@ func main() {
 		cmds = append(cmds, line)
 		if !strings.HasSuffix(line, ";") {
 			rl.SetPrompt(">>> ")
+			index += 1
 			continue
 		}
+
 		cmd := strings.Join(cmds, " ")
 		cmds = cmds[:0]
 		rl.SetPrompt("> ")
-		rl.SaveHistory(cmd)
-		println(cmd)
+
+		if index != 0 {
+			rl.SaveReplaceHistory(cmd, index)
+		}
+		index = 0
+
 	}
 }

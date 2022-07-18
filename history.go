@@ -66,7 +66,7 @@ func (o *opHistory) initHistory() {
 func (o *opHistory) historyUpdatePath(path string) {
 	o.fdLock.Lock()
 	defer o.fdLock.Unlock()
-	f, err := os.OpenFile(path, os.O_APPEND|os.O_CREATE|os.O_RDWR, 0666)
+	f, err := os.OpenFile(path, os.O_APPEND|os.O_CREATE|os.O_RDWR, 0o666)
 	if err != nil {
 		return
 	}
@@ -112,7 +112,7 @@ func (o *opHistory) rewriteLocked() {
 	}
 
 	tmpFile := o.cfg.HistoryFile + ".tmp"
-	fd, err := os.OpenFile(tmpFile, os.O_CREATE|os.O_WRONLY|os.O_TRUNC|os.O_APPEND, 0666)
+	fd, err := os.OpenFile(tmpFile, os.O_CREATE|os.O_WRONLY|os.O_TRUNC|os.O_APPEND, 0o666)
 	if err != nil {
 		return
 	}
@@ -244,7 +244,6 @@ func (o *opHistory) debug() {
 
 // save history
 func (o *opHistory) New(current []rune) (err error) {
-
 	// history deactivated
 	if !o.enable {
 		return nil
@@ -295,6 +294,22 @@ func (o *opHistory) New(current []rune) (err error) {
 
 func (o *opHistory) Revert() {
 	o.historyVer++
+	o.current = o.history.Back()
+}
+
+// Deletes the `num` prior.
+func (o *opHistory) Delete(num int) {
+	// Leave o.current alone.. fmt.Printf("%d: '%s': %s\n", hi.Version, string(hi.Source), string(hi.Tmp))
+	i := 0
+	e := o.history.Back()
+	e = e.Prev() // Skip the last one.
+
+	for i <= num {
+		prev := e.Prev()
+		o.history.Remove(e)
+		e = prev
+		i++
+	}
 	o.current = o.history.Back()
 }
 

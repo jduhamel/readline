@@ -54,9 +54,9 @@ type Config struct {
 	InterruptPrompt string
 	EOFPrompt       string
 
-	FuncGetWidth    func() int
+	FuncGetWidth func() int
 	// Function that returns width, height of the terminal or -1,-1 if unknown
-	FuncGetSize     func() (width int, height int)
+	FuncGetSize func() (width int, height int)
 
 	Stdin       io.ReadCloser
 	StdinWriter io.Writer
@@ -265,6 +265,10 @@ func (i *Instance) Readline() (string, error) {
 func (i *Instance) ReadlineWithDefault(what string) (string, error) {
 	i.Operation.SetBuffer(what)
 	return i.Operation.String()
+}
+
+func (i *Instance) SaveReplaceHistory(content string, priors int) error {
+	return i.Operation.SaveReplaceHistory(content, priors)
 }
 
 func (i *Instance) SaveHistory(content string) error {
