@@ -267,8 +267,8 @@ func (i *Instance) ReadlineWithDefault(what string) (string, error) {
 	return i.Operation.String()
 }
 
-func (i *Instance) SaveReplaceHistory(content string, priors int) error {
-	return i.Operation.SaveReplaceHistory(content, priors)
+func (i *Instance) SquashHistory(content string, priors int) error {
+	return i.Operation.SquashHistory(content, priors)
 }
 
 func (i *Instance) SaveHistory(content string) error {

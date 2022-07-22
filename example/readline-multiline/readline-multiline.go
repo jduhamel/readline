@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"strings"
 
 	"github.com/jduhamel/readline"
@@ -10,7 +11,7 @@ func main() {
 	rl, err := readline.NewEx(&readline.Config{
 		Prompt:                 "> ",
 		HistoryFile:            "/tmp/readline-multiline",
-		DisableAutoSaveHistory: false,
+		DisableAutoSaveHistory: true,
 	})
 	if err != nil {
 		panic(err)
@@ -30,6 +31,7 @@ func main() {
 		}
 		cmds = append(cmds, line)
 		if !strings.HasSuffix(line, ";") {
+			rl.SaveHistory(line)
 			rl.SetPrompt(">>> ")
 			index += 1
 			continue
@@ -40,9 +42,8 @@ func main() {
 		rl.SetPrompt("> ")
 
 		if index != 0 {
-			rl.SaveReplaceHistory(cmd, index)
+			fmt.Printf("calling SquashHistory with %d:[%s]\n", index+1, cmd)
+			rl.SquashHistory(cmd, index)
 		}
-		index = 0
-
 	}
 }

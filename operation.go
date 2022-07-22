@@ -542,8 +542,11 @@ func (o *Operation) SaveHistory(content string) error {
 	return o.history.New([]rune(content))
 }
 
-func (o *Operation) SaveReplaceHistory(content string, replaced int) error {
-	o.history.Delete(replaced)
+func (o *Operation) SquashHistory(content string, replaced int) error {
+	for l := 0; l < replaced; l++ {
+		o.history.history.Remove(o.history.history.Back())
+	}
+	o.history.current = o.history.history.Back()
 	return o.history.New([]rune(content))
 }
 
